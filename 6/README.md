@@ -20,7 +20,7 @@
 ### Вариант 1
 Если у вас есть в проекте запросы к бд / в сеть / обработка изображений, то вынесите это с помощью GCD или Operation с главного потока, чтобы оно выполнялось параллельно. 
 Если для запросов вы пользуетесь фреймворками, то откажитесь от них на время и создайте запросы с помощью встроенных средств xCode, например:
-
+```Swift
     let url = URL(string: "http://www.stackoverflow.com")!
     
     let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
@@ -29,7 +29,8 @@
     }
 
     task.resume()
-    
+```
+  
 
 **Важно! НИ В КОЕМ СЛУЧАЕ НЕ ИСПОЛЬЗУЙТЕ FORCE UNWRAP**
 
@@ -37,6 +38,7 @@ https://stackoverflow.com/questions/24016142/how-do-i-make-an-http-request-in-sw
 
 ### Вариант 2
 Если у вас нет такого проекта, то задание будет состоять в том, что вы с помощью [запроса](https://jsonplaceholder.typicode.com/photos) забираете JSON с сервера, вот такого вида:
+```Java Script
 [
   {
     "albumId": 1,
@@ -47,7 +49,7 @@ https://stackoverflow.com/questions/24016142/how-do-i-make-an-http-request-in-sw
   }
   ........
   ]
- Это, по сути представляет из себя массив элементов:
+ /// Это, по сути представляет из себя массив элементов:
  {
     "albumId": 1,
     "id": 1,
@@ -56,16 +58,23 @@ https://stackoverflow.com/questions/24016142/how-do-i-make-an-http-request-in-sw
     "thumbnailUrl": "https://via.placeholder.com/150/92c952"
   },
   
+```
+  
+  
   Здесь есть поле url. По этому полю вы без труда сможете загрузить картинку (это тоже надо делать асинхронно):
  <details>
 <summary>Инcтрукция как скачивать картинку</summary>
 /// забираете данные из сети по URL
+    
+```Swift
 func getData(from url: URL, completion: @escaping (Data?, URLResponse?, Error?) -> ()) {
     URLSession.shared.dataTask(with: url, completionHandler: completion).resume()
 }
+```
 
 
 /// преобразуете их в картинку
+```Swift
 func downloadImage(from url: URL) {
     print("Download Started")
     getData(from: url) { data, response, error in
@@ -77,8 +86,10 @@ func downloadImage(from url: URL) {
         }
     }
 }
+```
 
 /// пример использования
+```Swift
 override func viewDidLoad() {
     super.viewDidLoad()
     // Do any additional setup after loading the view, typically from a nib.
@@ -87,8 +98,10 @@ override func viewDidLoad() {
     downloadImage(from: url)
     print("End of code. The image will continue downloading in the background and it will be loaded when it ends.")
 }
+```
 
 //// Или можете написать extension к UIImageView
+```Swift
 extension UIImageView {
     func downloaded(from url: URL, contentMode mode: UIView.ContentMode = .scaleAspectFit) {
         contentMode = mode
@@ -111,6 +124,7 @@ extension UIImageView {
 }
 
 imageView.downloaded(from: "Здесь ваш URL")
+```
 </details>
   
   
